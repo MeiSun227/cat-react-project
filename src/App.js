@@ -1,26 +1,47 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
+import React, { useState, useEffect } from 'react'
+import catService from './service/catService'
+import CatList from './Components/CatList'
+import breedService from './service/breedService'
+import BreedSelect from './Components/Breeds'
+
+
+const App = () => {
+  const [cats, setCats] = useState([])
+  const [breeds, setBreeds] = useState([])
+
+  const handleOnChange = async (event, data) => {
+    const newCats = await catService.getCatsByBreed(data.value)
+    console.log(newCats)
+    setCats(newCats)
+  }
+
+  useEffect(() => {
+    breedService
+      .getBreeds()
+      .then(breedData => {
+        setBreeds(breedData)
+      })
+
+  }, [])
+
+
+  useEffect(() => {
+    catService
+      .getAllCats()
+      .then(catData => {
+        setCats(catData)
+
+      })
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>Cat Heaven</h1>
+      <BreedSelect onChange={handleOnChange} breeds={breeds} />
+      <CatList cats={cats} />
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
